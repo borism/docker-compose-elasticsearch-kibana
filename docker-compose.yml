@@ -1,14 +1,14 @@
 version: '3.7'
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.4.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.4.2
     container_name: elasticsearch1
     environment:
       - node.name=elasticsearch1
-      - cluster.name=docker-cluster
+      - cluster.name=docker-swarm
       - cluster.initial_master_nodes=elasticsearch1
       - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms256M -Xmx256M"
+      - "ES_JAVA_OPTS=-Xms8g -Xmx8g"
       - http.cors.enabled=true
       - http.cors.allow-origin=*
       - network.host=_eth0_
@@ -28,10 +28,10 @@ services:
       resources:
         limits:
           cpus: '1'
-          memory: 256M
+          memory: 8g
         reservations:
           cpus: '1'
-          memory: 256M
+          memory: 8g
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -51,14 +51,14 @@ services:
       - 9200:9200
       - 9300:9300
   elasticsearch2:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.4.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.4.2
     container_name: elasticsearch2
     environment:
       - node.name=elasticsearch2
-      - cluster.name=docker-cluster
+      - cluster.name=docker-swarm
       - cluster.initial_master_nodes=elasticsearch1
       - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms256M -Xmx256M"
+      - "ES_JAVA_OPTS=-Xms8g -Xmx8g"
       - "discovery.zen.ping.unicast.hosts=elasticsearch1"
       - http.cors.enabled=true
       - http.cors.allow-origin=*
@@ -79,10 +79,10 @@ services:
       resources:
         limits:
           cpus: '1'
-          memory: 256M
+          memory: 8g
         reservations:
           cpus: '1'
-          memory: 256M
+          memory: 8g
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -101,14 +101,14 @@ services:
     ports:
       - 9201:9200
   elasticsearch3:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.4.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.4.2
     container_name: elasticsearch3
     environment:
       - node.name=elasticsearch3
-      - cluster.name=docker-cluster
+      - cluster.name=docker-swarm
       - cluster.initial_master_nodes=elasticsearch1
       - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms256M -Xmx256M"
+      - "ES_JAVA_OPTS=-Xms8g -Xmx8g"
       - "discovery.zen.ping.unicast.hosts=elasticsearch1"
       - http.cors.enabled=true
       - http.cors.allow-origin=*
@@ -129,10 +129,10 @@ services:
       resources:
         limits:
           cpus: '1'
-          memory: 256M
+          memory: 8g
         reservations:
           cpus: '1'
-          memory: 256M
+          memory: 8g
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -151,7 +151,7 @@ services:
     ports:
       - 9202:9200
   kibana:
-    image: docker.elastic.co/kibana/kibana:7.4.0
+    image: docker.elastic.co/kibana/kibana:7.4.2
     container_name: kibana
     environment:
       SERVER_NAME: localhost
@@ -177,10 +177,10 @@ services:
       resources:
         limits:
           cpus: '1'
-          memory: 256M
+          memory: 8g
         reservations:
           cpus: '1'
-          memory: 256M
+          memory: 8g
       restart_policy:
         condition: on-failure
         delay: 30s
@@ -190,7 +190,7 @@ services:
       - elastic
       - ingress
   auditbeat:
-    image: docker.elastic.co/beats/auditbeat:7.4.0
+    image: docker.elastic.co/beats/auditbeat:7.4.2
     command: auditbeat -e -strict.perms=false
     user: root
     environment:
@@ -204,7 +204,7 @@ services:
     networks:
       - elastic
   metricbeat:
-    image: docker.elastic.co/beats/metricbeat:7.4.0
+    image: docker.elastic.co/beats/metricbeat:7.4.2
     # command: --strict.perms=false
     environment:
       - setup.kibana.host=kibana:5601
@@ -222,7 +222,7 @@ services:
       - elastic
 
   heartbeat:
-    image: docker.elastic.co/beats/heartbeat:7.4.0
+    image: docker.elastic.co/beats/heartbeat:7.4.2
     command: --strict.perms=false
     environment:
       - setup.kibana.host=kibana:5601
@@ -233,7 +233,7 @@ services:
       - elastic
 
   packetbeat:
-    image: docker.elastic.co/beats/packetbeat:7.4.0
+    image: docker.elastic.co/beats/packetbeat:7.4.2
     command: --strict.perms=false
     environment:
       - setup.kibana.host=kibana:5601
@@ -247,7 +247,7 @@ services:
       - elastic
 
   filebeat:
-    image: docker.elastic.co/beats/filebeat:7.4.0
+    image: docker.elastic.co/beats/filebeat:7.4.2
     command: --strict.perms=false
     environment:
       - setup.kibana.host=kibana:5601
@@ -261,7 +261,7 @@ services:
     networks:
       - elastic
   apmserver:
-    image: docker.elastic.co/apm/apm-server:7.4.0
+    image: docker.elastic.co/apm/apm-server:7.4.2
     command: --strict.perms=false
     ports:
       - 8200:8200
@@ -275,7 +275,7 @@ services:
     networks:
         - elastic
   app-search:
-    image: docker.elastic.co/app-search/app-search:7.4.0
+    image: docker.elastic.co/app-search/app-search:7.4.2
     ports:
       - 3002:3002
     environment:
@@ -304,15 +304,3 @@ volumes:
 networks:
   elastic:
   ingress:
-
-# configs:
-#   auditbeat_config:
-#     file: configs/auditbeat.docker.yml
-#   filebeat_config:
-#     file: configs/filebeat.docker.yml
-#   heartbeat_config:
-#     file: configs/heartbeat.docker.yml
-#   metricbeat_config:
-#     file: configs/metricbeat.docker.yml
-#   packetbeat_config:
-#     file: configs/packetbeat.docker.yml
